@@ -1,17 +1,15 @@
+import json
 import socket
 import ssl
-import requests
+import sys
+import warnings
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-import sys
-from typing import List, Dict, Tuple
-import json
+from typing import Dict, List, Tuple
+
+import requests
+from colorama import Fore, Style, init
 from prettytable import PrettyTable
-from colorama import init, Fore, Style
-import warnings
-
-warnings.filterwarnings('ignore', category=Warning)
-
 
 class DomainChecker:
     def __init__(self, timeout: int = 5):
@@ -69,7 +67,6 @@ class DomainChecker:
 
     def check_domain(self, domain: str) -> Tuple[str, bool, str]:
         try:
-            # 尝试DNS解析
             ip = socket.gethostbyname(domain)
             
             try:
@@ -120,7 +117,7 @@ class DomainChecker:
         table.align["Category"] = "l"
         table.align["Domain"] = "l"
         table.align["Details"] = "l"
-        table.max_width["Details"] = 60  
+        table.max_width["Details"] = 60
         
         all_accessible = True
         sorted_categories = sorted(results.keys())
@@ -148,6 +145,8 @@ class DomainChecker:
         return console_report
 
 def main():
+    warnings.filterwarnings('ignore', category=Warning)
+    
     checker = DomainChecker()
     print("\nChecking domain accessibility... Please wait...")
     results = checker.check_all_domains()
@@ -155,6 +154,7 @@ def main():
     
     print(report)
     
+
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     json_file = f"domain_check_results_{timestamp}.json"
     with open(json_file, 'w', encoding='utf-8') as f:
